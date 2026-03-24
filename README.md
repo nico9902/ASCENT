@@ -27,6 +27,8 @@ The pipeline consists of three main components:
 2.  **Attention Mechanism**: A dedicated layer that computes attention scores $\alpha_i$ for each slice, aggregating them into a single context vector.
 3.  **Survival Predictor**: A Fully Connected network that outputs the risk distribution across 24 monthly time bins.
 
+![Proposed Method](figures/Proposed_Approach.png)
+
 ---
 
 ## 📊 Dataset & Preprocessing
@@ -40,10 +42,23 @@ The model was validated on the public **LUNG1 (NSCLC-Radiomics)** dataset and a 
 
 ---
 
-## ⚙️ Installation
-Clone the repository and install the required dependencies:
+## 🎓 Citation
 
-```bash
-git clone [https://github.com/your-username/lung-cancer-attention-survival.git](https://github.com/nico9902/ASCENT.git)
-cd deep-lung
-pip install -r requirements.txt
+If you use this code, please cite our work:
+```
+@article{paolo2026predicting,
+  title={Predicting lung cancer survival with attention-based CT slices combination},
+  author={Paolo, Domenico and Greco, Carlo and Ippolito, Edy and Fiore, Michele and Ramella, Sara and Soda, Paolo and Tortora, Matteo and Bria, Alessandro and Sicilia, Rosa},
+  journal={Health Information Science and Systems},
+  volume={14},
+  number={1},
+  pages={20},
+  year={2026},
+  publisher={Springer}
+}
+```
+---
+
+## 📜 License
+
+This project is licensed. Please review the [LICENSE](LICENSE) file for more information.
