@@ -6,5 +6,5 @@
 This repository contains the official implementation of the paper:
 
 **"Predicting Lung Cancer Survival with Attention-based CT Slices Combination"**  
-Authors: Domenico Paolo, Carlo Greco, Alessio Cortellini, Sara Ramella, Paolo Soda,  
-Alessandro Bria, Rosa Sicilia.
+Authors: Domenico Paolo, Carlo Greco, Alessio Cortellini, Sara Ramella, Paolo Soda,
+Matteo Tortora, Alessandro Bria, Rosa Sicilia.
