@@ -1,7 +1,7 @@
 # ASCENT \(Attention-based-Slice-Combination-for-survIval-prEdictioN-from-CT\)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
-[![Paper](https://link.springer.com/article/10.1007/s13755-025-00404-z)](https://doi.org/10.1007/s13755-025-00404-z)
+[![Paper](https://link.springer.com/article/10.1007/s13755-025-00404-z)](https://doi.org/10.1007/s13755-025-00404-z)]
 
 This repository contains the official implementation of the paper:
 
