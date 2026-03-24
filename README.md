@@ -44,6 +44,6 @@ The model was validated on the public **LUNG1 (NSCLC-Radiomics)** dataset and a 
 Clone the repository and install the required dependencies:
 
 ```bash
-git clone [https://github.com/your-username/lung-cancer-attention-survival.git](https://github.com/your-username/lung-cancer-attention-survival.git)
-cd lung-cancer-attention-survival
+git clone [https://github.com/your-username/lung-cancer-attention-survival.git](https://github.com/nico9902/ASCENT.git)
+cd deep-lung
 pip install -r requirements.txt
