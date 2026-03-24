@@ -27,7 +27,7 @@ The pipeline consists of three main components:
 2.  **Attention Mechanism**: A dedicated layer that computes attention scores $\alpha_i$ for each slice, aggregating them into a single context vector.
 3.  **Survival Predictor**: A Fully Connected network that outputs the risk distribution across 24 monthly time bins.
 
-![Proposed Method](figures/Proposed_Approach.png)
+![Proposed Method](figures/Method.png)
 
 ---
 
@@ -39,6 +39,8 @@ The model was validated on the public **LUNG1 (NSCLC-Radiomics)** dataset and a 
 * **Lung Masking**: Slices are filtered based on lung area (threshold > 2%) using a U-Net segmenter.
 * **HU Clipping**: Hounsfield Units clipped to $[-1000, 400]$ range.
 * **Normalization**: Min-Max scaling and resizing to $224 \times 224$ pixels.
+
+![Preprocessing](figures/Preprocessing.png)
 
 ---
 
