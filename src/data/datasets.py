@@ -83,7 +83,8 @@ class ImgDataset(torch.utils.data.Dataset):
         self.step = step
         self.transform = transform
 
-        # Build an index of slice paths per patient (no data loaded yet)
+        # Build an index of slice paths per patient. Images are loaded lazily in
+        # __getitem__, which keeps initialization cheap even for large CT cohorts.
         self._paths = [self._list_slices(pid) for pid in self.patientIDs]
         self.survival_times = list(self.times)
         self.targets = list(self.labels)
@@ -94,7 +95,8 @@ class ImgDataset(torch.utils.data.Dataset):
         if step=='train' and (self.mu is None or self.std is None):
             self.mu, self.std = self._compute_mean_std_streaming()
 
-        # Precompute masks for DeepHit (if requested)
+        # Precompute masks for DeepHit once, rather than rebuilding them for
+        # every epoch/batch.
         self.masks1 = None
         self.masks2 = None
         if num_Event is not None and num_Category is not None:
@@ -111,7 +113,7 @@ class ImgDataset(torch.utils.data.Dataset):
         return [os.path.join(pdir, f) for f in elements]
 
     def _compute_mean_std_streaming(self):
-        # Sample a subset for speed
+        # Compute train-set intensity statistics without keeping all slices in RAM.
         sel_patients = self._paths[:len(self._paths)]
         total = 0
         s = 0.0

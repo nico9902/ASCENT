@@ -16,6 +16,7 @@ def div(x, y):
 # create loss function
 # LOSS-FUNCTION 1 -- Log-likelihood loss
 def loss_Log_Likelihood(out, mask1, k):
+    """DeepHit likelihood term for observed events and censored patients."""
     I_1 = torch.sign(k)
 
     #for uncenosred: log P(T=t,K=k|x)
@@ -32,6 +33,7 @@ def loss_Log_Likelihood(out, mask1, k):
 
 # LOSS-FUNCTION 2 -- Ranking loss
 def loss_Ranking(out, num_Event, num_Category, mask2, t, k):
+    """Pairwise ranking term for time-dependent survival discrimination."""
     
     sigma1 = 0.1
     eta = []
@@ -86,6 +88,7 @@ def loss_Ranking(out, num_Event, num_Category, mask2, t, k):
 #     return loss3
 
 class DeepHitLoss(nn.Module):
+    """Weighted DeepHit objective used by ASCENT survival models."""
 
     def __init__(self, alpha, beta, num_Event, num_Category):
         super(DeepHitLoss, self).__init__()
