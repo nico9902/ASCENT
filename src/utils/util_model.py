@@ -19,8 +19,6 @@ import src.utils.util_general as util_general
 import src.model.networks as networks
 from src.utils.util_eval import ct_index
 
-from MedViT.MedViT import MedViT_small, MedViT_base, MedViT_large
-
 def set_parameter_requires_grad(model, freeze=False, half_freeze=False, unfreeze_last=False):
     """
     Adjusts the `requires_grad` attribute of model parameters based on the specified mode.
@@ -232,6 +230,8 @@ def initialize_model(model_name, backbone_output_size, cfg_model):
         model.classifier[2] = nn.Linear(in_features=num_ftrs, out_features=backbone_output_size)
         set_parameter_requires_grad(model, cfg_model["freeze"], cfg_model["half_freeze"], cfg_model["unfreeze_last"])
     elif model_name == "MedViT_small":
+        from MedViT.MedViT import MedViT_small
+
         model = MedViT_small(num_classes = 1000)
         if pretrained:
             checkpoint = torch.load("/mimer/NOBACKUP/groups/naiss2023-6-336/multimodal_os/deep-lung/MedViT/MedViT_small_im1k.pth")  #("/Users/domenicopaolo/Documents/PhD AI/Projects/deep-lung/MedViT/MedViT_small_im1k.pth", map_location="cpu")

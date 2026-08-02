@@ -10,11 +10,11 @@ import src.utils.util_network as util_network
 from src.utils import util_model as util_model
 from src.model import densenet as densenet
 
-from MST.mst.models.dino import DinoV2ClassifierSlice
-
 class DINOv2(nn.Module):
     def __init__(self, cfg, input_dims=None, network_settings=None, embedding_size=256):
         super(DINOv2, self).__init__()
+        from MST.mst.models.dino import DinoV2ClassifierSlice
+
         self.backbone3D = DinoV2ClassifierSlice(in_ch=1, out_ch=2)
         # if cfg['backbone']['pretrained']:
         #     checkpoint = torch.load("/mimer/NOBACKUP/groups/naiss2023-6-336/multimodal_os/deep-lung/MedViT/MedViT_small_im1k.pth", weights_only=False)  #("/Users/domenicopaolo/Documents/PhD AI/Projects/deep-lung/MST/MST_LIDC.ckpt", weights_only=False, map_location='cpu')
@@ -108,11 +108,12 @@ class SoftAttention(nn.Module):
             # use a fully connected layer
             self.classifier = nn.Linear(input_size, 1)
 
-    def forward(self, inputs): 
+    def forward(self, inputs):
         # get batch size and sequence length from inputs
         batch_size, depth, _ = inputs.size()
 
-        # create a mask to ignore padded elements
+        # Padding slices are all-zero embeddings. Mask them before softmax so
+        # padded positions cannot receive attention weight.
         mask = (inputs.sum(dim=2) != 0).float()
         #mask = torch.all(inputs != 0, dim=2).float()
 
@@ -126,8 +127,7 @@ class SoftAttention(nn.Module):
         # scores = (scores - scores.mean(dim=-1, keepdim=True)) / (scores.std(dim=-1, keepdim=True) + 1e-6)
 
         # apply softmax to get attention weights
-        attention_weights = F.softmax(scores, dim=1)  # Apply temperature scaling with temperature=0.1
-        #attention_weights = util_network.safe_softmax(scores)
+        attention_weights = util_network.safe_softmax(scores)
 
         # compute the weighted mean
         attention_weights = attention_weights.unsqueeze(2)
@@ -232,10 +232,10 @@ class SoftAttentionModel(nn.Module):
         backbone_outputs = backbone_outputs * mask.unsqueeze(-1)                        # e.g. [batch_size, num_slices, embedding_size]
 
         if self.fusion_criterion == "mean":
-            # compute slices-level soft attention
+            # Average slice embeddings after padding has been zeroed out.
             surv_features = backbone_outputs.mean(dim=1)                               # e.g. [batch_size, num_slices, embedding_size] -> [batch_size, embedding_size]
         elif self.fusion_criterion == "soft_attention":
-            # compute slices-level soft attention
+            # Learn a patient-level representation by weighting informative CT slices.
             surv_features, attention_weights = self.attention_layer(backbone_outputs)  # e.g. [batch_size, num_slices, embedding_size] -> [batch_size, embedding_size]
             attention_weights = attention_weights.squeeze()
         else:

@@ -1,4 +1,5 @@
 # import libraries
+import argparse
 import sys; print('Python %s on %s' % (sys.version, sys.platform))
 sys.path.extend(["./"])
 
@@ -8,10 +9,6 @@ import collections
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 import src.utils.util_general as util_general
-
-# seed everything
-seed = 0
-util_general.seed_all(seed)
 
 # cross-validation class
 class Cross_Validation:
@@ -67,13 +64,13 @@ class Cross_Validation:
         data_split = data[[self.split_col, self.surv_time, self.y_label]].reset_index(drop=True).drop_duplicates()
 
         # convert survival time to months
-        data_split[surv_time] = data_split[surv_time] // 30
+        data_split[self.surv_time] = data_split[self.surv_time] // 30
 
         # convert survival time to binary label in 2 years
-        data_split[y_label] = data_split.apply(lambda row: 0 if row[surv_time] > 24 else row[y_label], axis=1)
+        data_split[self.y_label] = data_split.apply(lambda row: 0 if row[self.surv_time] > 24 else row[self.y_label], axis=1)
 
         # cut survival times greater than 2 years
-        data_split[surv_time] = data_split.apply(lambda row: 24 if row[surv_time] > 24 else row[surv_time], axis=1)
+        data_split[self.surv_time] = data_split.apply(lambda row: 24 if row[self.surv_time] > 24 else row[self.surv_time], axis=1)
 
         # k-folds cv
         fold_data = collections.defaultdict(lambda: {})
@@ -106,7 +103,7 @@ class Cross_Validation:
 
         # create split dir
         steps = ['train', 'val', 'test']
-        for fold in range(cv):
+        for fold in range(self.cv):
             dest_dir_cv = os.path.join(self.dest_dir_folds, str(fold))
             util_general.create_dir(dest_dir_cv)
 
@@ -129,26 +126,29 @@ class Cross_Validation:
                     df.to_csv(file, index=False, sep=',')
 
 
-if __name__=="__main__":
+def parse_args():
+    parser = argparse.ArgumentParser(description="Create patient-level train/val/test cross-validation CSV files.")
+    parser.add_argument("--dataset", default="radiomics", help="Dataset name used for dataset-specific exclusions.")
+    parser.add_argument("--data_file", default="data/radiomics/NSCLC-Radiomics-Lung1.clinical-version3-Oct-2019.csv", help="Input clinical CSV file.")
+    parser.add_argument("--dest_dir", default="./data/processed/radiomics/os_2y/folds", help="Output directory for generated folds.")
+    parser.add_argument("--split_col", default="PatientID", help="Patient identifier column.")
+    parser.add_argument("--surv_time", default="Survival.time", help="Survival time column, in days.")
+    parser.add_argument("--y_label", default="deadstatus.event", help="Event label column.")
+    parser.add_argument("--cv", type=int, default=10, help="Number of cross-validation folds.")
+    parser.add_argument("--val_size", type=float, default=0.1, help="Validation fraction inside each training split.")
+    return parser.parse_args()
 
-    # params
-    dataset   = 'radiomics'
-    data_file = "data/radiomics/NSCLC-Radiomics-Lung1.clinical-version3-Oct-2019.csv"
-    y_label   = "deadstatus.event"
-    surv_time = "Survival.time"
-    split_col = "PatientID"
-    cv        = 10
-    val_size  = 0.1
+
+if __name__=="__main__":
+    args = parse_args()
+    util_general.seed_all(0)
 
     # files and directories
-    dest_dir = "./data/processed/radiomics/os_2y/folds"
-    dest_dir_folds = os.path.join(dest_dir, str(cv))
-    util_general.create_dir(dest_dir)
-    
-    # cv
-    cross_val = Cross_Validation(data_file=data_file, dest_dir=dest_dir, dest_dir_folds=dest_dir_folds, 
-                                split_col=split_col, surv_time=surv_time, y_label=y_label, dataset=dataset,
-                                cv=cv, val_size=val_size)
-    cross_val.create_cv_files()
+    dest_dir_folds = os.path.join(args.dest_dir, str(args.cv))
+    util_general.create_dir(args.dest_dir)
 
-    
+    # cv
+    cross_val = Cross_Validation(data_file=args.data_file, dest_dir=args.dest_dir, dest_dir_folds=dest_dir_folds,
+                                split_col=args.split_col, surv_time=args.surv_time, y_label=args.y_label, dataset=args.dataset,
+                                cv=args.cv, val_size=args.val_size)
+    cross_val.create_cv_files()

@@ -21,6 +21,40 @@ Predicting survival from Computed Tomography (CT) scans is challenging due to th
 
 ---
 
+## 🚀 How to Run
+
+1. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Create cross-validation files:
+
+```bash
+python -m src.data.create_cv_files \
+  --dataset radiomics \
+  --data_file data/radiomics/NSCLC-Radiomics-Lung1.clinical-version3-Oct-2019.csv \
+  --dest_dir data/processed/radiomics/os_2y/folds \
+  --cv 10 \
+  --val_size 0.1
+```
+
+3. Train ASCENT from a YAML configuration:
+
+```bash
+python -m src.model.train_cv \
+  --cfg_file path/to/config.yaml \
+  --exp_name ascent_experiment \
+  --seed 0
+```
+
+The repository expects preprocessed CT slices as `.npy` files grouped by patient. Large datasets, model checkpoints, and experiment outputs are intentionally excluded from version control.
+
+Some experimental backbones, such as DINOv2 and MedViT, depend on external source trees/checkpoints that are not distributed with this repository. The standard 2D torchvision backbones can be used with the dependencies listed in `requirements.txt`.
+
+---
+
 ## 🏗 Model Architecture
 The pipeline consists of three main components:
 1.  **Feature Extractor**: An EfficientNetB0 backbone that processes $N$ slices per patient.
@@ -47,7 +81,7 @@ The model was validated on the public **LUNG1 (NSCLC-Radiomics)** dataset and a 
 ## 🎓 Citation
 
 If you use this code, please cite our work:
-```
+```bibtex
 @article{paolo2026predicting,
   title={Predicting lung cancer survival with attention-based CT slices combination},
   author={Paolo, Domenico and Greco, Carlo and Ippolito, Edy and Fiore, Michele and Ramella, Sara and Soda, Paolo and Tortora, Matteo and Bria, Alessandro and Sicilia, Rosa},

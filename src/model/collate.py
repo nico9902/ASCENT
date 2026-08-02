@@ -5,7 +5,11 @@ from torch.nn.utils.rnn import pad_sequence
 
 def mask_slices(inputs, mask_percentage=0.2):
     """
-        Mask a percentage of slices in the input tensor
+        Mask a percentage of slices in each patient volume.
+
+        The collator uses this as slice-level regularization during training:
+        selected slices are zeroed before padding, forcing the attention model
+        to avoid depending on one narrow region of the CT stack.
     """
     masked_inputs = []
     for input in inputs:
@@ -32,7 +36,7 @@ class MyCollator(object):
         inputs = [torch.stack(input) for input, _, _, _, _, _ in batch]
         
         if self.stage == 'train' and self.mask_percentage != 0:
-            inputs, masked_slices = mask_slices(inputs, self.mask_percentage)
+            inputs = mask_slices(inputs, self.mask_percentage)
         inputs = pad_sequence(inputs, batch_first=True, padding_value=0)
         # survival times
         survival_times = [survival_time for _, survival_time, _, _, _, _ in batch]
